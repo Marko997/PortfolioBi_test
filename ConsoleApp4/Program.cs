@@ -26,7 +26,8 @@ namespace PortfolioBi
                 Console.WriteLine("Close average: " + Math.Round(stock.avgClose.Average(), 2) + "$");
                 
             }
-
+            double deviation = Math.Round(stock.GetDeviation(stock.avgClose),2);
+            Console.WriteLine(deviation);
 
             Console.ReadLine();
         }
@@ -37,6 +38,24 @@ namespace PortfolioBi
         public List<decimal> avgMin = new List<decimal>();
         public List<decimal> avgMax = new List<decimal>();
         public List<decimal> avgClose = new List<decimal>();
+
+        public double GetDeviation(List<decimal> values)
+        {
+            decimal avgPrice = values.Average();
+            decimal variance = 0m;
+            double deviation;
+
+            for (int i = 0; i < values.Count; i++) //Calculating variance
+            {
+                variance += (values[i] - avgPrice)* (values[i] - avgPrice);
+            }
+
+            variance = variance / values.Count;
+
+            deviation = Math.Sqrt((double)variance);
+
+            return deviation;
+        }
 
         public List<decimal> GetSpikes(List<decimal> values, decimal deviation)
         {
