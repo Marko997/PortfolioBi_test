@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +24,8 @@ namespace PortfolioBi
 
             StockData stock = new StockData();
 
+            //TextWriter tw = new StreamWriter("StockData.txt");
+
             var stockAwaiter = stock.GetStockData(symbol, startDate, endDate);
             var dividendAwaiter = stock.GetDividendData(symbol, startDate, endDateForDividend);
 
@@ -30,8 +34,9 @@ namespace PortfolioBi
                 Console.WriteLine("Minimum average: " + Math.Round(stock.avgMin.Average(), 2) + "$");
                 Console.WriteLine("Maximum average: " + Math.Round(stock.avgMax.Average(), 2) + "$");
                 Console.WriteLine("Close average: " + Math.Round(stock.avgClose.Average(), 2) + "$");
-                
+
             }
+
             decimal deviation = (decimal)Math.Round(stock.GetDeviation(stock.avgClose),2);
             Console.WriteLine("First most significant positive spike: " + stock.GetSpikes(stock.avgClose,deviation).Max()+"$");
 
@@ -47,8 +52,31 @@ namespace PortfolioBi
                 Console.WriteLine("ROI: " + roiResult + "%");
             }
 
+            WriteObjectToJsonFile(stock.stocksList, "StockData.json");
+
             Console.ReadLine();
         }
+        private static void WriteObjectToJsonFile(object obj, string path)
+        {
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+
+            using (var sw = new StreamWriter(path))
+            {
+                sw.Write(json);
+            }
+        }
+    }
+
+
+
+    class Stock
+    {
+        public string companyName;
+        public string date;
+
+        public decimal closePrice;
+        public decimal minPrice;
+        public decimal maxPrice;
     }
 
     class StockData
@@ -60,6 +88,9 @@ namespace PortfolioBi
         public decimal dividend;
         public decimal startPrice;
 
+        public Stock stock = new Stock();
+
+        public List<Stock> stocksList = new List<Stock>();
 
         public async Task<int> GetDividendData(string symbol, DateTime startDate, DateTime endDate)
         {
@@ -143,21 +174,18 @@ namespace PortfolioBi
 
                 for (int i = 0; i < history.Count; i++)
                 {
-                    Console.WriteLine(companyName + " Closing price on: " +
-                                      history.ElementAt(i).DateTime.Month +
-                                      "/" + history.ElementAt(i).DateTime.Day +
-                                      "/" + history.ElementAt(i).DateTime.Year +
-                                      ": $" + Math.Round(history.ElementAt(i).Close, 2) +
-                                      " min price: " + Math.Round(history.ElementAt(i).Low, 2) +
-                                      " max price: " + Math.Round(history.ElementAt(i).High, 2));
+                    stocksList.Add(new Stock { companyName = companyName, date = history.ElementAt(i).DateTime.Date.ToShortDateString(),
+                                                closePrice = Math.Round(history.ElementAt(i).Close, 2) , 
+                                                minPrice = Math.Round(history.ElementAt(i).Low, 2) , 
+                                                maxPrice = Math.Round(history.ElementAt(i).High, 2)});
 
                     avgMin.Add(Math.Round(history.ElementAt(i).Low, 2));
                     avgMax.Add(Math.Round(history.ElementAt(i).High, 2));
                     avgClose.Add(Math.Round(history.ElementAt(i).Close, 2));
 
                     startPrice = avgClose.ElementAt(0);
-                }
 
+                }
             }
             catch
             {
