@@ -24,8 +24,6 @@ namespace PortfolioBi
 
             StockData stock = new StockData();
 
-            //TextWriter tw = new StreamWriter("StockData.txt");
-
             var stockAwaiter = stock.GetStockData(symbol, startDate, endDate);
             var dividendAwaiter = stock.GetDividendData(symbol, startDate, endDateForDividend);
 
@@ -37,8 +35,8 @@ namespace PortfolioBi
 
             }
 
-            decimal deviation = (decimal)Math.Round(stock.GetDeviation(stock.avgClose),2);
-            Console.WriteLine("First most significant positive spike: " + stock.GetSpikes(stock.avgClose,deviation).Max()+"$");
+            decimal deviation = (decimal)Math.Round(stock.GetDeviation(stock.avgClose), 2);
+            Console.WriteLine("First most significant positive spike: " + stock.GetSpikes(stock.avgClose, deviation).Max() + "$");
 
             startPrice = stock.startPrice;
             sellPrice = stock.GetSpikes(stock.avgClose, 0).Max();
@@ -67,8 +65,6 @@ namespace PortfolioBi
         }
     }
 
-
-
     class Stock
     {
         public string companyName;
@@ -83,7 +79,7 @@ namespace PortfolioBi
     {
         public List<decimal> avgMin = new List<decimal>();
         public List<decimal> avgMax = new List<decimal>();
-        public List<decimal> avgClose = new List<decimal>(); 
+        public List<decimal> avgClose = new List<decimal>();
 
         public decimal dividend;
         public decimal startPrice;
@@ -103,14 +99,7 @@ namespace PortfolioBi
 
                 for (int i = 0; i < dividends.Count; i++)
                 {
-                    Console.WriteLine(companyName + " Dividend: " +
-                                      dividends.ElementAt(i).DateTime.Month +
-                                      "/" + dividends.ElementAt(i).DateTime.Day +
-                                      "/" + dividends.ElementAt(i).DateTime.Year +
-                                      ": dividend: " + Math.Round(dividends.ElementAt(i).Dividend, 2)
-                                      );
                     dividend = Math.Round(dividends.ElementAt(i).Dividend, 2);
-                    Console.WriteLine(dividend + "sadsadsadsadasdasd");
                 }
             }
             catch (Exception)
@@ -129,7 +118,7 @@ namespace PortfolioBi
 
             for (int i = 0; i < values.Count; i++) //Calculating variance
             {
-                variance += (values[i] - avgPrice)* (values[i] - avgPrice);
+                variance += (values[i] - avgPrice) * (values[i] - avgPrice);
             }
 
             variance = variance / values.Count;
@@ -174,10 +163,14 @@ namespace PortfolioBi
 
                 for (int i = 0; i < history.Count; i++)
                 {
-                    stocksList.Add(new Stock { companyName = companyName, date = history.ElementAt(i).DateTime.Date.ToShortDateString(),
-                                                closePrice = Math.Round(history.ElementAt(i).Close, 2) , 
-                                                minPrice = Math.Round(history.ElementAt(i).Low, 2) , 
-                                                maxPrice = Math.Round(history.ElementAt(i).High, 2)});
+                    stocksList.Add(new Stock
+                    {
+                        companyName = companyName,
+                        date = history.ElementAt(i).DateTime.Date.ToShortDateString(),
+                        closePrice = Math.Round(history.ElementAt(i).Close, 2),
+                        minPrice = Math.Round(history.ElementAt(i).Low, 2),
+                        maxPrice = Math.Round(history.ElementAt(i).High, 2)
+                    });
 
                     avgMin.Add(Math.Round(history.ElementAt(i).Low, 2));
                     avgMax.Add(Math.Round(history.ElementAt(i).High, 2));
