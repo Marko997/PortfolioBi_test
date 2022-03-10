@@ -34,12 +34,12 @@ namespace PortfolioBi
                 Console.WriteLine("Close average: " + Math.Round(stock.avgClose.Average(), 2) + "$");
 
             }
-
+            
             decimal deviation = (decimal)Math.Round(stock.GetDeviation(stock.avgClose), 2);
             Console.WriteLine("First most significant positive spike: " + stock.GetSpikes(stock.avgClose, deviation).Max() + "$");
 
-            startPrice = stock.startPrice;
-            sellPrice = stock.GetSpikes(stock.avgClose, 0).Max();
+            startPrice = stock.avgClose.ElementAt(0);
+            sellPrice = stock.GetSpikes(stock.avgClose, deviation).Max();
 
             if (dividendAwaiter.Result == 1)
             {
@@ -82,7 +82,6 @@ namespace PortfolioBi
         public List<decimal> avgClose = new List<decimal>();
 
         public decimal dividend;
-        public decimal startPrice;
 
         public Stock stock = new Stock();
 
@@ -175,9 +174,6 @@ namespace PortfolioBi
                     avgMin.Add(Math.Round(history.ElementAt(i).Low, 2));
                     avgMax.Add(Math.Round(history.ElementAt(i).High, 2));
                     avgClose.Add(Math.Round(history.ElementAt(i).Close, 2));
-
-                    startPrice = avgClose.ElementAt(0);
-
                 }
             }
             catch
